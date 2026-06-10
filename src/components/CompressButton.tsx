@@ -1,3 +1,5 @@
+import { useTranslation } from '../lib/i18n'
+
 interface CompressButtonProps {
   isCompressing: boolean
   isEnabled: boolean
@@ -5,6 +7,8 @@ interface CompressButtonProps {
 }
 
 export function CompressButton({ isCompressing, isEnabled, onCompress }: CompressButtonProps) {
+  const { t } = useTranslation()
+
   return (
     <button
       disabled={!isEnabled || isCompressing}
@@ -15,7 +19,7 @@ export function CompressButton({ isCompressing, isEnabled, onCompress }: Compres
           : 'bg-primary-container text-on-primary-container opacity-50 cursor-not-allowed'
       }`}
     >
-      <span>{isCompressing ? 'Compressing...' : 'Compress PDF'}</span>
+      <span>{isCompressing ? t('compressButton.compressing') : t('compressButton.compress')}</span>
       {isCompressing && (
         <div
           className="absolute bottom-0 left-0 h-1 bg-on-primary progress-fill"

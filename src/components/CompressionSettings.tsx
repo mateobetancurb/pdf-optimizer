@@ -1,10 +1,6 @@
-export type Quality = 'screen' | 'ebook' | 'print'
+import { useTranslation } from '../lib/i18n'
 
-const levels: { value: Quality; title: string; detail: string }[] = [
-  { value: 'screen', title: 'Smallest file', detail: 'Max compression · 72 dpi · email & on-screen' },
-  { value: 'ebook', title: 'Balanced', detail: 'Good quality · 150 dpi · reading on devices' },
-  { value: 'print', title: 'Best quality', detail: 'Light compression · 300 dpi · printing' },
-]
+export type Quality = 'screen' | 'ebook' | 'print'
 
 interface CompressionSettingsProps {
   quality: Quality
@@ -12,11 +8,19 @@ interface CompressionSettingsProps {
 }
 
 export function CompressionSettings({ quality, onQualityChange }: CompressionSettingsProps) {
+  const { t } = useTranslation()
+
+  const levels: { value: Quality; title: string; detail: string }[] = [
+    { value: 'screen', title: t('compressionSettings.screen.title'), detail: t('compressionSettings.screen.detail') },
+    { value: 'ebook', title: t('compressionSettings.ebook.title'), detail: t('compressionSettings.ebook.detail') },
+    { value: 'print', title: t('compressionSettings.print.title'), detail: t('compressionSettings.print.detail') },
+  ]
+
   return (
     <div className="space-y-3">
-      <p className="text-label-md font-semibold text-on-surface">Compression level</p>
+      <p className="text-label-md font-semibold text-on-surface">{t('compressionSettings.label')}</p>
 
-      <div role="radiogroup" aria-label="Compression level" className="space-y-2">
+      <div role="radiogroup" aria-label={t('compressionSettings.label')} className="space-y-2">
         {levels.map((level) => {
           const isSelected = quality === level.value
           return (

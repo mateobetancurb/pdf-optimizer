@@ -1,3 +1,5 @@
+import { useTranslation } from '../lib/i18n'
+
 interface FileInfoProps {
   fileName: string
   fileSize: string
@@ -5,6 +7,8 @@ interface FileInfoProps {
 }
 
 export function FileInfo({ fileName, fileSize, onRemove }: FileInfoProps) {
+  const { t } = useTranslation()
+
   return (
     <div className="flex items-center justify-between p-4 bg-surface-container rounded-lg border border-outline-variant">
       <div className="flex items-center gap-3">
@@ -17,7 +21,7 @@ export function FileInfo({ fileName, fileSize, onRemove }: FileInfoProps) {
       <button
         className="material-symbols-outlined text-on-surface-variant hover:text-error transition-colors"
         onClick={onRemove}
-        aria-label="Remove file"
+        aria-label={t('fileInfo.removeFile')}
       >
         close
       </button>

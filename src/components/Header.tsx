@@ -1,9 +1,15 @@
+import { useTranslation, type Lang } from '../lib/i18n'
+
 interface HeaderProps {
   isDark: boolean
   onToggleDark: () => void
+  lang: Lang
+  onToggleLang: () => void
 }
 
-export function Header({ isDark, onToggleDark }: HeaderProps) {
+export function Header({ isDark, onToggleDark, lang, onToggleLang }: HeaderProps) {
+  const { t } = useTranslation()
+
   return (
     <header className="bg-surface dark:bg-background border-b border-outline-variant dark:border-outline fixed top-0 w-full z-50">
       <div className="flex justify-between items-center h-16 px-padding-md max-w-[640px] mx-auto w-full">
@@ -16,15 +22,33 @@ export function Header({ isDark, onToggleDark }: HeaderProps) {
           </svg>
           <span className="font-semibold text-on-surface text-base">ShrinkPDF</span>
         </div>
-        <button
-          onClick={onToggleDark}
-          className="p-2 rounded-full hover:bg-surface-container-high transition-colors"
-          aria-label="Toggle dark mode"
-        >
-          <span className="material-symbols-outlined text-on-surface-variant">
-            {isDark ? 'light_mode' : 'dark_mode'}
-          </span>
-        </button>
+        <div className="flex items-center gap-2">
+          <div className="flex items-center rounded-full border border-outline-variant overflow-hidden">
+            {(['en', 'es'] as Lang[]).map((l) => (
+              <button
+                key={l}
+                onClick={onToggleLang}
+                aria-pressed={lang === l}
+                className={`px-2.5 py-1 text-xs font-semibold uppercase transition-colors ${
+                  lang === l
+                    ? 'bg-primary text-on-primary'
+                    : 'text-on-surface-variant hover:text-on-surface'
+                }`}
+              >
+                {l}
+              </button>
+            ))}
+          </div>
+          <button
+            onClick={onToggleDark}
+            className="p-2 rounded-full hover:bg-surface-container-high transition-colors"
+            aria-label={t('header.toggleDark')}
+          >
+            <span className="material-symbols-outlined text-on-surface-variant">
+              {isDark ? 'light_mode' : 'dark_mode'}
+            </span>
+          </button>
+        </div>
       </div>
     </header>
   )

@@ -1,4 +1,5 @@
 import type { CompressOutcome } from '../lib/compressPdf'
+import { useTranslation } from '../lib/i18n'
 
 interface ResultsCardProps {
   outcome: CompressOutcome
@@ -11,8 +12,11 @@ function mb(bytes: number): string {
 }
 
 export function ResultsCard({ outcome, downloadUrl, onReset }: ResultsCardProps) {
+  const { t } = useTranslation()
   const savings = Math.max(0, Math.round((1 - outcome.compressedSize / outcome.originalSize) * 100))
   const savedImages = outcome.stats?.imagesRecoded ?? 0
+  const savingsLabel = t('results.savings', { savings })
+    + (savedImages > 0 ? t('results.imagesRecompressed', { count: savedImages }) : '')
 
   return (
     <div className="bg-surface-container-low border border-outline-variant p-padding-md rounded-xl text-center space-y-4 shadow-sm">
@@ -26,24 +30,24 @@ export function ResultsCard({ outcome, downloadUrl, onReset }: ResultsCardProps)
       </div>
 
       <h3 className="font-semibold text-headline-md text-on-surface">
-        {outcome.usedOriginal ? 'Already optimized' : 'Compression complete!'}
+        {outcome.usedOriginal ? t('results.alreadyOptimized') : t('results.complete')}
       </h3>
 
       <div className="bg-surface-container-highest p-4 rounded-lg inline-block">
         {outcome.usedOriginal ? (
           <p className="text-body-md text-on-surface-variant">
-            This PDF was already as small as we can make it — your original was kept unchanged
-            ({mb(outcome.originalSize)}).
+            {t('results.unchangedBody', { mb: mb(outcome.originalSize) })}
           </p>
         ) : (
           <>
             <p className="text-body-md text-on-surface-variant">
-              Original: <span className="font-bold">{mb(outcome.originalSize)}</span>
-              {' → '}
-              Compressed: <span className="font-bold text-primary">{mb(outcome.compressedSize)}</span>
+              {t('results.sizeComparison', {
+                originalSize: mb(outcome.originalSize),
+                compressedSize: mb(outcome.compressedSize),
+              })}
             </p>
             <p className="text-label-md font-semibold text-on-secondary-container mt-1">
-              Saved {savings}%{savedImages > 0 ? ` · ${savedImages} images recompressed` : ''}
+              {savingsLabel}
             </p>
           </>
         )}
@@ -53,7 +57,7 @@ export function ResultsCard({ outcome, downloadUrl, onReset }: ResultsCardProps)
         {outcome.mode === 'save' ? (
           <p className="text-body-sm text-on-surface-variant flex items-center justify-center gap-2">
             <span className="material-symbols-outlined text-primary">save</span>
-            Saved to <span className="font-semibold">{outcome.fileName}</span>
+            {t('results.savedTo', { fileName: outcome.fileName ?? '' })}
           </p>
         ) : (
           downloadUrl && (
@@ -63,7 +67,7 @@ export function ResultsCard({ outcome, downloadUrl, onReset }: ResultsCardProps)
               className="w-full py-3 bg-secondary text-on-secondary rounded-lg text-label-md font-semibold flex items-center justify-center gap-2 hover:brightness-110 active:scale-[0.98] transition-all"
             >
               <span className="material-symbols-outlined">download</span>
-              Download compressed file
+              {t('results.download')}
             </a>
           )
         )}
@@ -71,7 +75,7 @@ export function ResultsCard({ outcome, downloadUrl, onReset }: ResultsCardProps)
           className="text-primary text-label-md font-semibold hover:underline decoration-2 underline-offset-4 transition-all"
           onClick={onReset}
         >
-          Compress another file
+          {t('results.compressAnother')}
         </button>
       </div>
     </div>

@@ -7,10 +7,12 @@ import { CompressionSettings, type Quality } from './components/CompressionSetti
 import { CompressButton } from './components/CompressButton'
 import { ResultsCard } from './components/ResultsCard'
 import { compressPdf, CancelledError, type CompressOutcome } from './lib/compressPdf'
+import { I18nProvider, detectLang, useTranslation, type Lang } from './lib/i18n'
 
 type AppState = 'idle' | 'fileSelected' | 'compressing' | 'done'
 
-export default function App() {
+function AppContent({ lang, onToggleLang }: { lang: Lang; onToggleLang: () => void }) {
+  const { t } = useTranslation()
   const [appState, setAppState] = useState<AppState>('idle')
   const [file, setFile] = useState<File | null>(null)
   const [quality, setQuality] = useState<Quality>('screen')
@@ -24,7 +26,7 @@ export default function App() {
 
   function handleFileSelect(f: File) {
     if (f.type !== 'application/pdf') {
-      alert('Please select a PDF file.')
+      alert(t('app.error.notPdf'))
       return
     }
     setFile(f)
@@ -67,8 +69,8 @@ export default function App() {
       console.error(err)
       const message =
         (err as Error).message === 'ENCRYPTED'
-          ? 'This PDF is password-protected/encrypted, which is not supported.'
-          : 'Could not compress this PDF. It may be corrupted or use an unsupported format.'
+          ? t('app.error.encrypted')
+          : t('app.error.corrupt')
       alert(message)
       setAppState('fileSelected')
     }
@@ -85,15 +87,18 @@ export default function App() {
 
   return (
     <div className="min-h-screen flex flex-col bg-surface dark:bg-background text-on-surface transition-colors duration-300">
-      <Header isDark={isDark} onToggleDark={() => setIsDark((d) => !d)} />
+      <Header
+        isDark={isDark}
+        onToggleDark={() => setIsDark((d) => !d)}
+        lang={lang}
+        onToggleLang={onToggleLang}
+      />
 
       <main className="flex-1 flex flex-col items-center pt-24 pb-8 px-padding-md">
         <div className="w-full max-w-[640px] space-y-section-gap">
           <div className="text-center space-y-2">
-            <h1 className="font-bold text-headline-lg text-on-surface">Compress PDF</h1>
-            <p className="text-body-md text-on-surface-variant">
-              Reduce file size while preserving quality. 100% private — processed in your browser.
-            </p>
+            <h1 className="font-bold text-headline-lg text-on-surface">{t('app.title')}</h1>
+            <p className="text-body-md text-on-surface-variant">{t('app.subtitle')}</p>
           </div>
 
           {appState === 'done' && outcome ? (
@@ -126,5 +131,19 @@ export default function App() {
 
       <Footer />
     </div>
+  )
+}
+
+export default function App() {
+  const [lang, setLang] = useState<Lang>(detectLang)
+
+  function onToggleLang() {
+    setLang((l) => (l === 'en' ? 'es' : 'en'))
+  }
+
+  return (
+    <I18nProvider lang={lang} onLangChange={setLang}>
+      <AppContent lang={lang} onToggleLang={onToggleLang} />
+    </I18nProvider>
   )
 }

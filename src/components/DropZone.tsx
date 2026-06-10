@@ -1,10 +1,12 @@
 import { useRef } from 'react'
+import { useTranslation } from '../lib/i18n'
 
 interface DropZoneProps {
   onFileSelect: (file: File) => void
 }
 
 export function DropZone({ onFileSelect }: DropZoneProps) {
+  const { t } = useTranslation()
   const inputRef = useRef<HTMLInputElement>(null)
 
   function handleDragOver(e: React.DragEvent) {
@@ -46,9 +48,9 @@ export function DropZone({ onFileSelect }: DropZoneProps) {
       />
       <div className="flex flex-col items-center gap-3">
         <span className="material-symbols-outlined text-primary text-5xl">upload_file</span>
-        <p className="font-semibold text-on-surface text-body-md">Drop your PDF here</p>
+        <p className="font-semibold text-on-surface text-body-md">{t('dropzone.heading')}</p>
         <p className="text-on-surface-variant text-body-sm">
-          or <span className="text-primary font-medium">choose file</span> from your device
+          {t('dropzone.subheading')}
         </p>
       </div>
     </div>
