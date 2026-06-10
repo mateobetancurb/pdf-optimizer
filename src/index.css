@@ -73,7 +73,7 @@
 @layer base {
   body {
     font-family: 'Inter', sans-serif;
-    background-color: #fbf8ff;
+    background-color: var(--color-background);
   }
 
   button:not(:disabled),
@@ -96,5 +96,44 @@
 
   .progress-fill {
     transition: width 2s ease-in-out;
+  }
+
+  .dark {
+    --color-background: #12131a;
+    --color-surface: #12131a;
+    --color-surface-dim: #12131a;
+    --color-surface-bright: #373845;
+    --color-surface-container-lowest: #0d0e15;
+    --color-surface-container-low: #1a1b22;
+    --color-surface-container: #1e1f27;
+    --color-surface-container-high: #282931;
+    --color-surface-container-highest: #33343c;
+    --color-on-background: #e4e1ec;
+    --color-on-surface: #e4e1ec;
+    --color-on-surface-variant: #c7c4d6;
+    --color-surface-variant: #464553;
+    --color-outline: #918fa0;
+    --color-outline-variant: #464553;
+    --color-surface-tint: #c1c1ff;
+    --color-primary: #c1c1ff;
+    --color-on-primary: #1d1b92;
+    --color-primary-container: #3533b0;
+    --color-on-primary-container: #e2dfff;
+    --color-inverse-primary: #4241bc;
+    --color-secondary: #c3c0ff;
+    --color-on-secondary: #241f82;
+    --color-secondary-container: #3e3c8f;
+    --color-on-secondary-container: #e2dfff;
+    --color-inverse-surface: #e4e1ec;
+    --color-inverse-on-surface: #2f3038;
+    --color-error: #ffb4ab;
+    --color-on-error: #690005;
+    --color-error-container: #93000a;
+    --color-on-error-container: #ffdad6;
+  }
+
+  .dark .drop-zone-active {
+    border-color: #c1c1ff !important;
+    background-color: rgba(193, 193, 255, 0.07) !important;
   }
 }
