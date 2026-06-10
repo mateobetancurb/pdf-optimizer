@@ -23,9 +23,24 @@ A single-page, client-only PDF compression UI. React 19 + TypeScript + Vite 8, s
 
 Dark mode is applied by toggling the `dark` class on `document.documentElement` in a `useEffect`; Tailwind's `dark:` variants key off it.
 
-### Compression is mocked
+### Compression (real, client-side, hand-written — no dependencies)
 
-`handleCompress` in `App.tsx` does **not** actually process a PDF. It runs a 2s `setTimeout` and computes a fake result (`originalSize * 0.37`). Real PDF compression has not been implemented — when adding it, replace this stub. The app is described as "100% private — processed in your browser," so any implementation should stay client-side.
+`handleCompress` in `App.tsx` calls `compressPdf(file, quality)` (`src/lib/compressPdf.ts`), which runs a **from-scratch PDF parser/optimizer in a Web Worker** (`src/workers/compress.worker.ts`). No third-party libraries — only browser-native Web APIs (`CompressionStream`, `OffscreenCanvas`, `createImageBitmap`, File System Access). Nothing is uploaded.
+
+The engine lives in `src/lib/pdf/`:
+- `object.ts` — PDF object model (names, refs, strings, dicts, streams).
+- `lexer.ts` — tolerant tokenizer/parser for the eight object types.
+- `document.ts` — xref (classic tables **and** xref streams), `/Prev` chains, hybrid files, object streams; lazy, cached `getObject`. Detects `/Encrypt` and refuses (encrypted PDFs are unsupported).
+- `filters.ts` / `flate.ts` — FlateDecode via native `CompressionStream('deflate')` + PNG/TIFF predictors.
+- `optimize.ts` — **lossless**: deflate uncompressed streams; **lossy**: downsample + JPEG-recompress images. Skips `/SMask`/`/Mask` targets to preserve transparency, and copies through anything it doesn't understand (JBIG2, CCITT, JPX, Indexed, …).
+- `image.ts` — browser-only image recoder (OffscreenCanvas → JPEG) injected into `optimize`; per-preset max edge + JPEG quality.
+- `serialize.ts` — rewrites every object uncompressed with a fresh classic xref; drops the old ObjStm/XRef containers.
+
+Quality presets map to image targets in `image.ts`: `screen` (1000px / q0.5), `ebook` (1600px / q0.72), `print` (2500px / q0.82).
+
+Two output modes (`compressPdf.ts`): files ≥250MB stream straight to disk via the File System Access API (Chrome/Edge only); smaller files come back as a Blob for download. In download mode the worker never returns a file larger than the input (`usedOriginal`). `ResultsCard` renders both modes.
+
+**Known limitations (v1):** input is read fully into memory (practical ceiling ~1.5–2GB; a windowed Blob-slice source is the future upgrade for multi-GB); encrypted PDFs unsupported; image downsampling caps pixel dimensions rather than computing true on-page dpi.
 
 ### Design system → Tailwind theme
 
