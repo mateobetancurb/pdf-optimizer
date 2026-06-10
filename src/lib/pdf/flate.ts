@@ -6,10 +6,10 @@ async function runStream(
   data: Uint8Array,
   transform: CompressionStream | DecompressionStream,
 ): Promise<Uint8Array> {
-  const pair = transform as unknown as ReadableWritablePair<Uint8Array, Uint8Array>
-  const stream = new Blob([data as BlobPart]).stream().pipeThrough(pair)
-  const buf = await new Response(stream).arrayBuffer()
-  return new Uint8Array(buf)
+  const pair = transform as unknown as ReadableWritablePair<Uint8Array, Uint8Array>;
+  const stream = new Blob([data as BlobPart]).stream().pipeThrough(pair);
+  const buf = await new Response(stream).arrayBuffer();
+  return new Uint8Array(buf);
 }
 
 /**
@@ -18,13 +18,13 @@ async function runStream(
  */
 export async function inflate(data: Uint8Array): Promise<Uint8Array> {
   try {
-    return await runStream(data, new DecompressionStream('deflate'))
+    return await runStream(data, new DecompressionStream("deflate"));
   } catch {
-    return await runStream(data, new DecompressionStream('deflate-raw'))
+    return await runStream(data, new DecompressionStream("deflate-raw"));
   }
 }
 
 /** Compress bytes into a zlib (RFC 1950) stream suitable for /FlateDecode. */
 export async function deflate(data: Uint8Array): Promise<Uint8Array> {
-  return runStream(data, new CompressionStream('deflate'))
+  return runStream(data, new CompressionStream("deflate"));
 }

@@ -8,7 +8,9 @@ Package manager is **pnpm** (see `pnpm-lock.yaml`).
 
 - `pnpm dev` — start Vite dev server with HMR
 - `pnpm build` — type-check (`tsc -b`) then production build
-- `pnpm lint` — run ESLint over the repo
+- `pnpm lint` — run oxlint over the repo
+- `pnpm format` — format with oxfmt
+- `pnpm format:check` — check formatting without writing
 - `pnpm preview` — serve the production build locally
 
 There is no test runner configured.
@@ -28,6 +30,7 @@ Dark mode is applied by toggling the `dark` class on `document.documentElement` 
 `handleCompress` in `App.tsx` calls `compressPdf(file, quality)` (`src/lib/compressPdf.ts`), which runs a **from-scratch PDF parser/optimizer in a Web Worker** (`src/workers/compress.worker.ts`). No third-party libraries — only browser-native Web APIs (`CompressionStream`, `OffscreenCanvas`, `createImageBitmap`, File System Access). Nothing is uploaded.
 
 The engine lives in `src/lib/pdf/`:
+
 - `object.ts` — PDF object model (names, refs, strings, dicts, streams).
 - `lexer.ts` — tolerant tokenizer/parser for the eight object types.
 - `document.ts` — xref (classic tables **and** xref streams), `/Prev` chains, hybrid files, object streams; lazy, cached `getObject`. Detects `/Encrypt` and refuses (encrypted PDFs are unsupported).

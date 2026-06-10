@@ -1,34 +1,34 @@
-import { useRef } from 'react'
-import { useTranslation } from '../lib/i18n'
+import { useRef } from "react";
+import { useTranslation } from "../lib/i18n";
 
 interface DropZoneProps {
-  onFileSelect: (file: File) => void
+  onFileSelect: (file: File) => void;
 }
 
 export function DropZone({ onFileSelect }: DropZoneProps) {
-  const { t } = useTranslation()
-  const inputRef = useRef<HTMLInputElement>(null)
+  const { t } = useTranslation();
+  const inputRef = useRef<HTMLInputElement>(null);
 
   function handleDragOver(e: React.DragEvent) {
-    e.preventDefault()
-    e.currentTarget.classList.add('drop-zone-active')
+    e.preventDefault();
+    e.currentTarget.classList.add("drop-zone-active");
   }
 
   function handleDragLeave(e: React.DragEvent) {
-    e.preventDefault()
-    e.currentTarget.classList.remove('drop-zone-active')
+    e.preventDefault();
+    e.currentTarget.classList.remove("drop-zone-active");
   }
 
   function handleDrop(e: React.DragEvent) {
-    e.preventDefault()
-    e.currentTarget.classList.remove('drop-zone-active')
-    const file = e.dataTransfer.files[0]
-    if (file) onFileSelect(file)
+    e.preventDefault();
+    e.currentTarget.classList.remove("drop-zone-active");
+    const file = e.dataTransfer.files[0];
+    if (file) onFileSelect(file);
   }
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0]
-    if (file) onFileSelect(file)
+    const file = e.target.files?.[0];
+    if (file) onFileSelect(file);
   }
 
   return (
@@ -48,11 +48,9 @@ export function DropZone({ onFileSelect }: DropZoneProps) {
       />
       <div className="flex flex-col items-center gap-3">
         <span className="material-symbols-outlined text-primary text-5xl">upload_file</span>
-        <p className="font-semibold text-on-surface text-body-md">{t('dropzone.heading')}</p>
-        <p className="text-on-surface-variant text-body-sm">
-          {t('dropzone.subheading')}
-        </p>
+        <p className="font-semibold text-on-surface text-body-md">{t("dropzone.heading")}</p>
+        <p className="text-on-surface-variant text-body-sm">{t("dropzone.subheading")}</p>
       </div>
     </div>
-  )
+  );
 }
