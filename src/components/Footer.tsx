@@ -5,7 +5,7 @@ export function Footer() {
         <div className="flex items-center gap-2 opacity-80">
           <span className="text-label-md font-semibold text-primary">ShrinkPDF</span>
           <span className="text-on-surface-variant text-label-sm">|</span>
-          <span className="text-on-surface-variant text-label-sm">© 2024 ShrinkPDF. Secure &amp; Private.</span>
+          <span className="text-on-surface-variant text-label-sm">© {new Date().getFullYear()} ShrinkPDF. Secure &amp; Private.</span>
         </div>
         <div className="flex gap-6">
           <a className="text-on-surface-variant text-label-sm hover:text-primary transition-colors" href="#">Terms</a>
