@@ -6,6 +6,7 @@ import { FileInfo } from './components/FileInfo'
 import { CompressionSettings, type Quality } from './components/CompressionSettings'
 import { CompressButton } from './components/CompressButton'
 import { ResultsCard } from './components/ResultsCard'
+import { compressPdf, CancelledError, type CompressOutcome } from './lib/compressPdf'
 
 type AppState = 'idle' | 'fileSelected' | 'compressing' | 'done'
 
@@ -14,7 +15,8 @@ export default function App() {
   const [file, setFile] = useState<File | null>(null)
   const [quality, setQuality] = useState<Quality>('screen')
   const [isDark, setIsDark] = useState(false)
-  const [compressedSize, setCompressedSize] = useState(0)
+  const [outcome, setOutcome] = useState<CompressOutcome | null>(null)
+  const [downloadUrl, setDownloadUrl] = useState<string | null>(null)
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', isDark)
@@ -29,24 +31,53 @@ export default function App() {
     setAppState('fileSelected')
   }
 
+  function clearResult() {
+    setDownloadUrl((prev) => {
+      if (prev) URL.revokeObjectURL(prev)
+      return null
+    })
+    setOutcome(null)
+  }
+
   function handleRemoveFile() {
     setFile(null)
+    clearResult()
     setAppState('idle')
   }
 
-  function handleCompress() {
+  async function handleCompress() {
+    if (!file) return
     setAppState('compressing')
-    setTimeout(() => {
-      const originalMB = file!.size / (1024 * 1024)
-      setCompressedSize(originalMB * 0.37)
+    try {
+      const result = await compressPdf(file, quality)
+      setOutcome(result)
+      if (result.mode === 'download' && result.blob) {
+        const blob = result.blob
+        setDownloadUrl((prev) => {
+          if (prev) URL.revokeObjectURL(prev)
+          return URL.createObjectURL(blob)
+        })
+      }
       setAppState('done')
-    }, 2000)
+    } catch (err) {
+      if (err instanceof CancelledError) {
+        setAppState('fileSelected')
+        return
+      }
+      console.error(err)
+      const message =
+        (err as Error).message === 'ENCRYPTED'
+          ? 'This PDF is password-protected/encrypted, which is not supported.'
+          : 'Could not compress this PDF. It may be corrupted or use an unsupported format.'
+      alert(message)
+      setAppState('fileSelected')
+    }
   }
 
   function handleReset() {
     setFile(null)
     setQuality('screen')
-    setCompressedSize(0)
+    clearResult()
     setAppState('idle')
   }
 
@@ -65,12 +96,8 @@ export default function App() {
             </p>
           </div>
 
-          {appState === 'done' ? (
-            <ResultsCard
-              originalSize={file!.size / (1024 * 1024)}
-              compressedSize={compressedSize}
-              onReset={handleReset}
-            />
+          {appState === 'done' && outcome ? (
+            <ResultsCard outcome={outcome} downloadUrl={downloadUrl} onReset={handleReset} />
           ) : (
             <div className="space-y-4">
               {appState === 'idle' ? (
